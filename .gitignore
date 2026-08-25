@@ -1,0 +1,47 @@
+# History files
+.Rhistory
+.Rapp.history
+
+# Session data
+.RData
+.Rproj.user/
+.Rhistory
+.RData
+.DS_Store
+
+# Environment / renv
+.Renviron
+renv/library/
+renv/local/
+renv/cellar/
+renv/lock/
+renv/python/
+renv/staging/
+
+# OAuth2 token cache
+.httr-oauth
+
+# knitr and R markdown output
+*_cache/
+/cache/
+
+# Shiny token
+rsconnect/
+
+# Compiled files
+*.o
+*.so
+*.dll
+
+# Package build artifacts
+src/*.o
+src/*.so
+src/*.dll
+*.tar.gz
+
+# Byte-compiled files
+*.Rcheck/
+
+# macOS / Windows junk
+.DS_Store
+Thumbs.db

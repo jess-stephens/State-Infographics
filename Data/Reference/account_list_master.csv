@@ -1,0 +1,66 @@
+tas_code,agency_code,account_code,account_name,total_obligations,analysis_status,query_filter,pull_timestamp
+072-1037,072,1037,"Economic Support Fund, Funds Appropriated to the President",52363529251.61,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1031,019,1031,"Global Health Programs, State",25901340842.05,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1035,072,1035,"International Disaster Assistance, Funds Appropriated to the President, US Agency for International Development",22505706086.53,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1021,072,1021,"Development Assistance, Agency for International Development, Funds Appropriated to the President",16459014892.32,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0113,019,0113,"Diplomatic and Consular Programs, State",13645256188.02,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1143,019,1143,"Migration and Refugee Assistance, State",12820278131.07,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-0306,072,0306,"Assistance for Europe, Eurasia, and Central Asia, Funds Appropriated to the President, US Agency for International Development",9640191301.53,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-4519,019,4519,"Working Capital Fund, State",8608594934.87,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-5713,019,5713,"Consular and Border Security Programs, Administration of Foreign Affairs, State",6828138480.45,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-0040,011,0040,"United States Emergency Refugee and Migration Assistance Fund, Funds Appropriated to the President, Executive Office of the President",6130406722.22,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-8824,072,8824,"Gifts and Donations, Agency for International Development",5063813899.59,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1033,072,1033,"HIV/AIDS Working Capital Fund, Agency for International Development",4903045954.16,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+012-2278,012,2278,"Food for Peace Title II Grants, Foreign Agricultural Service, Agriculture",4490823782.36,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0535,019,0535,"Embassy Security, Construction, and Maintenance, State",4393312790.87,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-1022,011,1022,"International Narcotics Control and Law Enforcement, International Security Assistance, State",4103826274.25,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1124,019,1124,"Contributions for International Peacekeeping Activities, State",3953379681,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1126,019,1126,"Contributions to International Organizations, State",3922893472.77,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0120,019,0120,"Capital Investment Fund, State",3644364820.06,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1160,019,1160,"Enduring Welcome Administration and Support, State",3424189651.81,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1000,072,1000,"Operating Expenses of the United States Agency for International Development, Funds Appropriated to the President",3036604369.54,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-1075,011,1075,"Non-Proliferation, Anti-Terrorism, Demining and Related Programs, International Security Assistance, State",2994131483.85,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0522,019,0522,"Emergencies in the Diplomatic and Consular Service, State",2309659275.38,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0209,019,0209,"Educational and Cultural Exchange Programs, State",2227979842.32,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1121,019,1121,"Democracy Fund, State",1954097145.27,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-5515,019,5515,"H-1B and L Fraud Prevention and Detection Account, State",1315944632.86,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0529,019,0529,"Office of the Inspector General, State",1110777452.29,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1030,019,1030,"Global HIV/AIDS Initiative, State",1034925777.75,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0210,019,0210,"National Endowment for Democracy, State",945249799.62,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1005,019,1005,"International Organizations and Programs, Funds Appropriated to the President, State",941310964,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-1032,011,1032,"Peacekeeping Operations, Funds Appropriated to the President",900933294.67,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1027,072,1027,"Transition Initiatives, Funds Appropriated to the President, US Agency for International Development",864241770.38,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1015,072,1015,"Complex Crises Fund, Funds Appropriated to the President, US Agency for International Development",831128058.51,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1095,072,1095,"Child Survival and Health Programs Fund, United States Agency for International Development",758281129.88,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-0300,072,0300,"Capital Investment Fund of the United States Agency for International Development, Funds Appropriated to the President",737272547.74,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1007,072,1007,"Operating Expenses of the United States Agency for International Development, Office of Inspector General, Funds Appropriated to the President",542662067.54,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-4513,072,4513,"Working Capital Fund, International Assistance Program",399006355.31,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1087,019,1087,"International Fisheries Commissions, State",202427038.81,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0523,019,0523,"Payment to the American Institute in Taiwan, State",113418358.12,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-8822,019,8822,"Conditional Gift Fund, General, State",110806168,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-8821,019,8821,"Unconditional Gift Fund, State",105732686.52,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+012-4336,012,4336,"Commodity Credit Corporation Fund, Agriculture",87208445.71,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1078,019,1078,"Construction, International Boundary and Water Commission, United States and Mexico, State",84917638.75,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0202,019,0202,"East-West Center, State",80647375,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-8502,072,8502,"Technical Assistance, United States Dollars Advanced from Foreign Governments, Agency for International Development",60797537.05,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0525,019,0525,"Payment to the Asia Foundation, State",60500000,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-4175,072,4175,"Property Management Fund, Agency for International Development",36765505.78,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-5177,019,5177,"International Litigation Fund, State",34966870.73,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1069,019,1069,"Salaries and Expenses, International Boundary and Water Commission, United States and Mexico, State",33947977.17,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-1082,011,1082,"Foreign Military Financing Program, Funds, Appropriated to the President",30948419.13,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-5151,019,5151,"International Center, Washington, D. C., State",18235819.26,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+011-1041,011,1041,"Global Security Contingency Fund, State",15237408.01,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1264,072,1264,"Development Credit Authority, United States International Development Finance Corporation",12359561.55,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1093,072,1093,"Assistance for the Independent States of the Former Soviet Union, Funds Appropriated to the President, United States Agency for International Development",10056888.98,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-8271,019,8271,"Israeli Arab Scholarship Program, State",6818364,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1014,072,1014,"Sub-Saharan Africa, Development Assistance, Funds Appropriated to the President",4977449.04,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1082,019,1082,"American Sections, International Commissions, State",4207248.33,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0545,019,0545,"Representation Expenses, State",2988305.61,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-8813,019,8813,"Center for Middle Eastern-Western Dialogue Trust Fund, State",1699999.12,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-1010,072,1010,"Assistance for Eastern Europe and the Baltic States, Funds Appropriated to the President",338942.02,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+021-2040,021,2040,"Research, Development, Test and Evaluation, Army",199500,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+047-4542,047,4542,"Federal Buildings Fund, General Services Administration",10000,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+524-2750,524,2750,"Expenses, Millennium Challenge Corporation",0,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+072-0305,072,0305,"Civilian Stabilization Initiative, Funds Appropriated to the President, Agency for International Development",-245002.42,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0121,019,0121,"Conflict Stabilization Operations, State",-299007.37,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-0520,019,0520,"Protection of Foreign Missions and Officials, State",-908985.23,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
