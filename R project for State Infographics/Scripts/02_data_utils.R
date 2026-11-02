@@ -18,20 +18,39 @@ library(rlang)
 # DOCUMENTATION: data_utils.R
 # ===========================================================================
 #' MODULE INVENTORY:
-#' 1. get_registry_config: The 'Reader'—Extracts manifest rows.
-#' 2. set_parameters: The 'DNA-Maker'—Calculates 1:1 comparative windows.
-#' 3. try_api: Wraps provider-specific API calls in error-handling logic.
-#' 4. fedspender: Handles calls to any usaspending API endpoint.
-#' 5. unbundle_data: Extracts data payload from API transport packet.
-#' 6. update_registry: The 'Writer'—Commits metadata to the central ledger.
-#' 7. verify_pipeline_sync: The 'Validator'—Checks for analytical drift.
-#' 8. clean_up: Removes all objects from global environment unless excluded.
+#' Section A - Registry Primitives
+#' 1. get_registry_config: The 'Reader'—Extracts manifest rows. Read one row 
+#' from the registry.
+#' 2. pluck_registry_json: dig into a JSON column within that row.
+#' 3. update_registry: The 'Writer'—Commits metadata to the central ledger.
+#' writes results back to the registry.
+#' 4. archive_cvs: back up a file before overwriting it. 
+#' Section B - Project Parameters
+#' 5. set_parameters: The 'DNA-Maker'—Calculates 1:1 comparative windows. 
+#' Calculate or retrieve the project's date windows.
+#' Section C - Pipeline Validation
+#' 6. verify_pipeline_sync: The 'Validator'—Checks for analytical drift.
+#' Check dates/order/completeness across the registry.
+#' Section D - API Transport Layer
+#' 7. try_api: Wraps provider-specific API calls in error-handling logic.
+#' Retry wrapper for any API call.
+#' 8. fedspender: Handles calls to any usaspending API endpoint.
+#' The actual USAspending request-builder.
+#' Section E - Response Processing
+#' 9. unbundle_data: Extracts data payload from API transport packet.
+#' Extract the data table from an API response. 
+#' 10. unbundle_metadata: Extract the status/audit info from an API response.
+#' 11. clean_up: Removes all objects from global environment unless excluded. 
+#' Reset the environment at the end of a script. 
 #' 
 #' DESIGN PRINCIPLE:
 #' This module enforces a "Shared Truth" model. No data is ingested without 
 #' being anchored to a specific Project DNA (time window/parameters).
 # ===========================================================================
 
+# ---------------------------------------------------------------------------
+# --- Section A — Registry Primitives -----------------------------------
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # --- UTILITY_01: [ get_registry_config ] -----------------------------------
@@ -117,166 +136,7 @@ pluck_registry_json <- function(d_name, json_col, json_nest = NULL) {
 
 
 # ---------------------------------------------------------------------------
-# --- UTILITY_03: [ archive_csv ] ---------------------------------------
-# ---------------------------------------------------------------------------
-
-#' Archive Dataset Prior to Overwrite
-#'
-#' @description
-#' Moves a prior version of a file to a flat archive directory. Designed as 
-#' a temporary safe haven to allow for validation before final commit.
-#'
-#' @param file_path String. The path to the file to be archived.
-#'    Aligns with file_path in data_registry.csv.
-#' @param archive_dir String. The target directory for archived files. 
-#'    Defaults to "data/archive".
-#'
-#' @return String. The path to the archived file on success; NULL if the 
-#'    file doesn't exist or archiving fails.
-#' @export
-
-archive_csv <- function(file_path, archive_dir = "data/archive") {
-  
-  # 1. Defensive check for NULL or missing file_path
-  if (is.null(file_path) || file_path == "" || !fs::file_exists(file_path)) {
-    message(">>> [Archive]: No valid file found to archive. Skipping.")
-    return(NULL)
-  }
-  
-  # 2. Defensive check for malformed archive_dir
-  if (is.null(archive_dir) || archive_dir == "") {
-    warning(">>> [Archive]: archive_dir was NULL or empty. Reverting to 'data/archive'.")
-    archive_dir <- "data/archive"
-  }
-  
-  # 3. Ensure the Archive Safe Haven exists
-  if (!fs::dir_exists(archive_dir)) fs::dir_create(archive_dir)
-  
-  # 4. Generate Timestamped Filename
-  file_name <- fs::path_file(file_path)
-  file_ext  <- fs::path_ext(file_path)
-  file_base <- fs::path_ext_remove(file_name)
-  timestamp  <- format(fs::file_info(file_path)$modification_time, "%Y%m%d_%H%M%S")
-  
-  archive_name <- paste0(file_base, "_", timestamp, ".", file_ext)
-  archive_path <- fs::path(archive_dir, archive_name)
-  
-  # 5. Execute Copy
-  archive_result <- tryCatch({
-    fs::file_copy(file_path, archive_path, overwrite = TRUE)
-    message(paste(">>> [Archive]: File archived to", archive_path))
-    return(as.character(archive_path)) 
-  }, error = function(e) {
-    warning(paste(">>> [Archive Error]:", e$message))
-    return(NULL)
-  })
-  
-  return(archive_result)
-}
-
-
-# ---------------------------------------------------------------------------
-# --- UTILITY_04: [ set_parameters ] ----------------------------------------
-# ---------------------------------------------------------------------------
-
-#' Initialize or Retrieve Global Project Parameters
-#'
-#' @description
-#' Manages the "Project DNA" stored in the registry's project_metadata row. 
-#' It calculates the 1:1 comparative windows required for the AOTH v2 
-#' framework or resumes from the existing registry state.
-#' 
-#' @details 
-#' This function leverages \code{pluck_registry_json()} for state-awareness, 
-#' \code{archive_csv()} for registry protection during fresh initialization, 
-#' and \code{update_registry()} for persistence.
-#'
-#' @param force_new Logical. If TRUE, bypasses existing registry data  
-#'    and triggers a fresh parameter calculation and registry archive. 
-#'    Defaults to FALSE.
-#'
-#' @return A named list (params) containing target and comparison date ranges.
-#' @export
-
-set_parameters <- function(force_new = FALSE) {
-  
-  # 1. Check for existing global_params
-  # NULL or NA values in the registry will result in is.list() being FALSE
-  
-  existing_params <- pluck_registry_json(d_name = "project_metadata", 
-                                      json_col  = "global_params", 
-                                      json_nest = NULL)
-  
-  if (is.list(existing_params) && !force_new) {
-    message(">>> [Status]: Existing project metadata found in Registry.")
-    confirm <- utils::askYesNo(paste0(
-      "Current Window: ", existing_params$target_start, " to ", existing_params$target_end, 
-      "\nKeep these parameters?"
-    ))
-    if (isTRUE(confirm)) return(existing_params)
-  }
-  
-  # 2. Archive registry before overwriting global_params
-  # This triggers if we are forcing a reset or if it's the very first run
-  
-  if (force_new || !is.list(existing_params)) {
-    archive_csv("data/reference/data_registry.csv")
-  }
-  
-  # 3. Define new global_params
-  
-  message("[Action]: Defining new analytical parameters...")
-  
-  # 3.1. Define the target period for funding cuts
-  t_start    <- as.Date("2025-01-20") 
-  t_end      <- Sys.Date()
-  t_duration <- as.numeric(t_end - t_start)
-  
-  # 3.2. Define the comparison period before funding cuts
-  comp_start <- t_start - t_duration
-  comp_end   <- t_start - 1
-  
-  # 3.3. Define the full analytical window
-  anal_start <- comp_start
-  anal_end   <- t_end
-  anal_window     <- as.numeric(anal_end - anal_start)
-  
-  # 3.4. Define the broader discovery window for award search
-  disc_start <- anal_start - anal_window
-  disc_end   <- t_end
-  
-  # 3.5. Assemble full global_params schema
-  params <- list(
-    target_start     = as.character(t_start),
-    target_end       = as.character(t_end),
-    comparison_start = as.character(comp_start),
-    comparison_end   = as.character(comp_end),
-    analysis_start   = as.character(anal_start),
-    analysis_end     = as.character(anal_end),
-    discovery_start  = as.character(disc_start),
-    discovery_end    = as.character(disc_end)
-  )
-  
-  # 4. Commit to registry
-  
-  update_success <- update_registry(
-    d_name   = "project_metadata",
-    mod_name = "data_utils.R",
-    ts       = Sys.time(),
-    global_p = params
-  )
-  
-  if (update_success == TRUE) {
-  message("[Success]: Project parameters committed to registry (Sequence 0).")
-  return(params)
-  } else {
-    stop("[CRITICAL ERROR]: Failed to commit project parameters to registry. Parameters not set.")
-  }
-}
-
-
-# ---------------------------------------------------------------------------
-# --- UTILITY_05: [ update_registry ] ---------------------------------------
+# --- UTILITY_03: [ update_registry ] ---------------------------------------
 # ---------------------------------------------------------------------------
 
 #' Commit Metadata to the Data Registry
@@ -341,6 +201,175 @@ update_registry <- function(d_name, mod_name, ts, global_p, input_p = NULL, outp
   return(file.exists(registry_path))
 }
 
+
+# ---------------------------------------------------------------------------
+# --- UTILITY_04: [ archive_csv ] ---------------------------------------
+# ---------------------------------------------------------------------------
+
+#' Archive Dataset Prior to Overwrite
+#'
+#' @description
+#' Moves a prior version of a file to a flat archive directory. Designed as 
+#' a temporary safe haven to allow for validation before final commit.
+#'
+#' @param file_path String. The path to the file to be archived.
+#'    Aligns with file_path in data_registry.csv.
+#' @param archive_dir String. The target directory for archived files. 
+#'    Defaults to "data/archive".
+#'
+#' @return String. The path to the archived file on success; NULL if the 
+#'    file doesn't exist or archiving fails.
+#' @export
+
+archive_csv <- function(file_path, archive_dir = "data/archive") {
+  
+  # 1. Defensive check for NULL or missing file_path
+  if (is.null(file_path) || file_path == "" || !fs::file_exists(file_path)) {
+    message(">>> [Archive]: No valid file found to archive. Skipping.")
+    return(NULL)
+  }
+  
+  # 2. Defensive check for malformed archive_dir
+  if (is.null(archive_dir) || archive_dir == "") {
+    warning(">>> [Archive]: archive_dir was NULL or empty. Reverting to 'data/archive'.")
+    archive_dir <- "data/archive"
+  }
+  
+  # 3. Ensure the Archive Safe Haven exists
+  if (!fs::dir_exists(archive_dir)) fs::dir_create(archive_dir)
+  
+  # 4. Generate Timestamped Filename
+  file_name <- fs::path_file(file_path)
+  file_ext  <- fs::path_ext(file_path)
+  file_base <- fs::path_ext_remove(file_name)
+  timestamp  <- format(fs::file_info(file_path)$modification_time, "%Y%m%d_%H%M%S")
+  
+  archive_name <- paste0(file_base, "_", timestamp, ".", file_ext)
+  archive_path <- fs::path(archive_dir, archive_name)
+  
+  # 5. Execute Copy
+  archive_result <- tryCatch({
+    fs::file_copy(file_path, archive_path, overwrite = TRUE)
+    message(paste(">>> [Archive]: File archived to", archive_path))
+    return(as.character(archive_path)) 
+  }, error = function(e) {
+    warning(paste(">>> [Archive Error]:", e$message))
+    return(NULL)
+  })
+  
+  return(archive_result)
+}
+
+# ---------------------------------------------------------------------------
+# --- Section B - Project Parameters -----------------------------------
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# --- UTILITY_05: [ set_parameters ] ----------------------------------------
+# ---------------------------------------------------------------------------
+
+#' Initialize or Retrieve Global Project Parameters
+#'
+#' @description
+#' Manages the "Project DNA" stored in the registry's project_metadata row. 
+#' It calculates the 1:1 comparative windows required for the AOTH v2 
+#' framework or resumes from the existing registry state.
+#' 
+#' @details 
+#' This function leverages \code{pluck_registry_json()} for state-awareness, 
+#' \code{archive_csv()} for registry protection during fresh initialization, 
+#' and \code{update_registry()} for persistence.
+#'
+#' @param force_new Logical. If TRUE, bypasses existing registry data  
+#'    and triggers a fresh parameter calculation and registry archive. 
+#'    Defaults to FALSE.
+#'
+#' @return A named list (params) containing target and comparison date ranges.
+#' @export
+
+set_parameters <- function(force_new = FALSE,
+                           target_end = Sys.Date(),
+                           ask = interactive() && !isTRUE(getOption("aoth.batch"))) {
+  
+  # 1. Check for existing global_params
+  # NULL or NA values in the registry will result in is.list() being FALSE
+  
+  existing_params <- pluck_registry_json(d_name = "project_metadata", 
+                                      json_col  = "global_params", 
+                                      json_nest = NULL)
+  
+  if (is.list(existing_params) && !force_new) {
+    message(">>> [Status]: Existing project metadata found in Registry.")
+    confirm <- if (ask) {
+      utils::askYesNo(paste0(
+        "Current Window: ", existing_params$target_start, " to ", existing_params$target_end, 
+        "\nKeep these parameters?"
+      ))
+    } else TRUE
+    if (isTRUE(confirm)) return(existing_params)
+  }
+  
+  # 2. Archive registry before overwriting global_params
+  # This triggers if we are forcing a reset or if it's the very first run
+  
+  if (force_new || !is.list(existing_params)) {
+    archive_csv("data/reference/data_registry.csv")
+  }
+  
+  # 3. Define new global_params
+  
+  message("[Action]: Defining new analytical parameters...")
+  
+  # 3.1. Define the target period for funding cuts
+  t_start    <- as.Date("2025-01-20") 
+  t_end      <- as.Date(target_end)
+  t_duration <- as.numeric(t_end - t_start)
+  
+  # 3.2. Define the comparison period before funding cuts
+  comp_start <- t_start - t_duration
+  comp_end   <- t_start - 1
+  
+  # 3.3. Define the full analytical window
+  anal_start <- comp_start
+  anal_end   <- t_end
+  anal_window     <- as.numeric(anal_end - anal_start)
+  
+  # 3.4. Define the broader discovery window for award search
+  disc_start <- anal_start - anal_window
+  disc_end   <- t_end
+  
+  # 3.5. Assemble full global_params schema
+  params <- list(
+    target_start     = as.character(t_start),
+    target_end       = as.character(t_end),
+    comparison_start = as.character(comp_start),
+    comparison_end   = as.character(comp_end),
+    analysis_start   = as.character(anal_start),
+    analysis_end     = as.character(anal_end),
+    discovery_start  = as.character(disc_start),
+    discovery_end    = as.character(disc_end)
+  )
+  
+  # 4. Commit to registry
+  
+  update_success <- update_registry(
+    d_name   = "project_metadata",
+    mod_name = "data_utils.R",
+    ts       = Sys.time(),
+    global_p = params
+  )
+  
+  if (update_success == TRUE) {
+  message("[Success]: Project parameters committed to registry (Sequence 0).")
+  return(params)
+  } else {
+    stop("[CRITICAL ERROR]: Failed to commit project parameters to registry. Parameters not set.")
+  }
+}
+
+# ---------------------------------------------------------------------------
+# --- Section C — Pipeline Validation -----------------------------------
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
 # --- UTILITY_06: [ verify_pipeline_sync ] ----------------------------------
@@ -469,9 +498,12 @@ verify_pipeline_sync <- function(d_name) {
   return(TRUE)
 }
 
+# ---------------------------------------------------------------------------
+# --- Section D — API Transport Layer -----------------------------------
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# --- UTILITY_03: [ try_api ] -----------------------------------------------
+# --- UTILITY_07: [ try_api ] -----------------------------------------------
 # ---------------------------------------------------------------------------
 
 #' Execute API Calls with Exponential Backoff and State Awareness
@@ -539,7 +571,7 @@ try_api <- function(api_function, ..., retries = 3, retry_pause = 2, context = l
 
 
 # ---------------------------------------------------------------------------
-# --- UTILITY_04: [ fedspender ]  -------------------------------------------
+# --- UTILITY_08: [ fedspender ]  -------------------------------------------
 # ---------------------------------------------------------------------------
 
 #' Robust utility for calls to any USAspending API endpoint
@@ -694,9 +726,12 @@ fedspender <- function(endpoint,
   ))
 }
 
+# ---------------------------------------------------------------------------
+# --- Section E — Response Processing -----------------------------------
+# ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
-# --- UTILITY_05: [ unbundle_data ] -----------------------------------------
+# --- UTILITY_09: [ unbundle_data ] -----------------------------------------
 # ---------------------------------------------------------------------------
 
 #' Extract Data Payload from API Transport Bundle
@@ -762,49 +797,8 @@ unbundle_data <- function(api_bundle) {
 
 
 
-
-
-
-
-
 # ---------------------------------------------------------------------------
-# --- UTILITY_08: [ clean_up ] ----------------------------------------------
-# ---------------------------------------------------------------------------
-
-#' Defensive Environment Purge
-#'
-#' @description
-#' Executes a "Clean Sweep" of the Global Environment by default. 
-#' Allows for specific objects to be preserved via the keep argument.
-#' To be executed on exit from a module.
-#'
-#' @param keep Character vector (Optional). Names of objects to exclude from the purge.
-#'
-#' @return Null. Clears .GlobalEnv.
-#' @export
-
-clean_up <- function(keep = NULL) {
-
-  # Identify all current objects
-  all_objects <- ls(envir = .GlobalEnv)
-  
-  # Determine targets (Everything minus the Keep list)
-  to_remove <- setdiff(all_objects, keep)
-  
-  # Execute Purge
-  if (length(to_remove) > 0) {
-    rm(list = to_remove, envir = .GlobalEnv)
-  }
-  
-  # Visual reset
-  cat("\014") 
-  
-  message("Restored to pristine environment.")
-}
-
-
-# ---------------------------------------------------------------------------
-# --- UTILITY_09: [ unbundle_metadata ] -------------------------------------
+# --- UTILITY_10: [ unbundle_metadata ] -------------------------------------
 # ---------------------------------------------------------------------------
 
 #' Unbundle Metadata from API Transport Bundle
@@ -853,10 +847,51 @@ unbundle_metadata <- function(api_bundle, iteration_ids = NULL) {
       has_data          = nrow(api_packet$data) > 0,
       iteration_context = list(id_list),
       error_message     = if (is.null(api_packet$error_msg)) {
-                            NA_character_ 
-                          } else { 
-                            as.character(api_packet$error_msg) 
-                          }
+        NA_character_ 
+      } else { 
+        as.character(api_packet$error_msg) 
+      }
     )
   })
 }
+
+
+# ---------------------------------------------------------------------------
+# --- Section F — Housekeeping -----------------------------------
+# ---------------------------------------------------------------------------
+
+# ---------------------------------------------------------------------------
+# --- UTILITY_1: [ clean_up ] ----------------------------------------------
+# ---------------------------------------------------------------------------
+
+#' Defensive Environment Purge
+#'
+#' @description
+#' Executes a "Clean Sweep" of the Global Environment by default. 
+#' Allows for specific objects to be preserved via the keep argument.
+#' To be executed on exit from a module.
+#'
+#' @param keep Character vector (Optional). Names of objects to exclude from the purge.
+#'
+#' @return Null. Clears .GlobalEnv.
+#' @export
+
+clean_up <- function(keep = NULL) {
+
+  # Identify all current objects
+  all_objects <- ls(envir = .GlobalEnv)
+  
+  # Determine targets (Everything minus the Keep list)
+  to_remove <- setdiff(all_objects, keep)
+  
+  # Execute Purge
+  if (length(to_remove) > 0) {
+    rm(list = to_remove, envir = .GlobalEnv)
+  }
+  
+  # Visual reset
+  cat("\014") 
+  
+  message("Restored to pristine environment.")
+}
+

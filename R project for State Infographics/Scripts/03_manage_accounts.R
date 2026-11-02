@@ -54,8 +54,8 @@ params <- list(
   # 1.2.2. Derived filter for API ingestion and registry logging
   api_filter = list(
     time_period = list(list(
-      start_date = params_from_registry$analysis_start, 
-      end_date   = params_from_registry$analysis_end
+      start_date = params_from_registry$discovery_start, 
+      end_date   = params_from_registry$discovery_end
     )),
     agencies = list(
       list(type = "awarding", tier = "toptier", name = "Agency for International Development"),
@@ -344,4 +344,4 @@ run_account_manager <- function() {
 # --- 7. STANDALONE EXECUTION -----------------------------------------------
 # ---------------------------------------------------------------------------
 
-if (interactive()) run_account_manager()
+if (interactive() && !isTRUE(getOption("aoth.batch"))) run_account_manager()

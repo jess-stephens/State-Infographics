@@ -313,7 +313,7 @@ prune_awards <- function() {
 run_award_manager <- function() {
   verify_pipeline_sync(params$datasets$api_raw)
   
-  while (TRUE) {``
+  while (TRUE) {
     # Extract counts from registry if they exist
     s3_award_count <- pluck_registry_json(
       params$datasets$api_raw, "output_params", c("data_counts", "output_count")
@@ -352,4 +352,4 @@ run_award_manager <- function() {
 # --- 6. STANDALONE EXECUTION -----------------------------------------------
 # ---------------------------------------------------------------------------
 
-if (interactive()) run_award_manager()
+  if (interactive() && !isTRUE(getOption("aoth.batch"))) run_award_manager()
