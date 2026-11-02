@@ -64,3 +64,6 @@ tas_code,agency_code,account_code,account_name,total_obligations,analysis_status
 072-0305,072,0305,"Civilian Stabilization Initiative, Funds Appropriated to the President, Agency for International Development",-245002.42,INCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
 019-0121,019,0121,"Conflict Stabilization Operations, State",-299007.37,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
 019-0520,019,0520,"Protection of Foreign Missions and Officials, State",-908985.23,EXCLUDE,Agencies: USAID|State; Range: 2022-10-01 to 2026-09-30,2026-05-01T19:04:16Z
+019-1550,019,1550,"International Humanitarian Assistance, State",1919985152.08,EXCLUDE,NA,2026-11-02T05:07:27Z
+019-1122,019,1122,"National Security Investment Programs, State",282825417.3,EXCLUDE,NA,2026-11-02T05:07:27Z
+019-1154,019,1154,"Andean Counterdrug Programs, State",-9638.5,EXCLUDE,NA,2026-11-02T05:07:27Z

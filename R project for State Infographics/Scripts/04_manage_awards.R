@@ -13,7 +13,7 @@ library(fs)
 library(lubridate)
 library(rlang)
 
-source("scripts/data_utils.R")
+source("Scripts/02_data_utils.R")
 
 
 # ===========================================================================
@@ -135,9 +135,11 @@ params <- list(
       params       = api_query,
       method       = "POST",
       context      = api_context,
-      timeout      = 60,
-      page_pause   = 1
-    ))
+      retries      = 5,
+      retry_pause  = 3,
+      timeout      = 120,
+      page_pause   = 2
+    )) 
   }
   
   
@@ -203,16 +205,29 @@ params <- list(
   )
   
   # 3.6.2. Unbundle & morph metadata
-  # Promoting 'none' to 'complete' if no error was reported (a "clean zero")
-  api_metadata <- unbundle_metadata(api_bundle = api_collection) %>%
+  # Promoting 'full' and clean-zero 'none' results to 'complete'
+  api_metadata <- unbundle_metadata(
+    api_bundle    = api_collection,
+    iteration_ids = c("tas_code", "group_name")
+  ) %>%
     mutate(
       row_id = row_number(),
-      adj_data_status = if_else(
-        data_status == "none" & (is.na(error_message) | error_message == ""), 
-        "complete", 
-        data_status
+      adj_data_status = case_when(
+        data_status == "full" ~ "complete",
+        data_status == "none" & (is.na(error_message) | error_message == "") ~ "complete",
+        TRUE ~ data_status
       )
     )
+  
+  # 3.6.2b. Save a per-call audit trail
+  dir.create("logs", showWarnings = FALSE)
+  api_metadata %>%
+    dplyr::mutate(
+      tas_code   = purrr::map_chr(iteration_context, ~ .x$tas_code   %||% NA_character_),
+      group_name = purrr::map_chr(iteration_context, ~ .x$group_name %||% NA_character_)
+    ) %>%
+    dplyr::select(tas_code, group_name, data_status, adj_data_status, error_message) %>%
+    readr::write_csv("logs/award_ingest_log.csv")
   
   # 3.6.3. Assign overall data_status
   # If the run resulted in only one unique status (all complete or all none), 
@@ -232,7 +247,7 @@ params <- list(
   # 3.6.5. Locate row the last success (for exit_criteria & last_page)
   # Defaults to the first row if the entire run was a failure
   success_idx     <- c(1, which(api_metadata$adj_data_status != "none" & 
-                                  row_number() <= min(fail_idx)))
+                                  seq_len(nrow(api_metadata)) <= min(fail_idx)))
   exit_row        <- slice(api_metadata, max(success_idx))
   
   # 3.6.6. Final output_param assignments

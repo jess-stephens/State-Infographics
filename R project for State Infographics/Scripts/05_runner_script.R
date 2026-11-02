@@ -28,7 +28,7 @@ stopifnot(
 )
 
 # 1.2. Load shared utilities
-source("Scripts/data_utils.R")
+source("Scripts/02_data_utils.R")
 
 # 1.3. Batch mode: no startup dashboards, no "keep parameters?" prompts
 options(aoth.batch = TRUE)
@@ -55,16 +55,30 @@ print(run_params)
 # --- 3. ACCOUNTS (Sequences 1-2) -------------------------------------------
 # ---------------------------------------------------------------------------
 
-source("manage_accounts.R")
+source("Scripts/03_manage_accounts.R")
 
 # 3.1. Pull accounts from the API
 ingest_accounts()
+
+# >>> [Fedspender]: Requesting page 1 for endpoint /api/v2/search/spending_by_category/federal_account/...
+# >>> [Fedspender]: Success. Retrieved 68 records from page 1.
+# 68 accounts retrieved from API and saved to: data/raw/account_list_from_api.csv
+
 
 # 3.2. Assign new accounts. USAID (072) is auto-included. You will be
 #      prompted for any NEW non-USAID account. Those decisions are saved in
 #      data/reference/account_list_master.csv, so commit that file.
 assign_accounts()
 
+# Account: International Humanitarian Assistance, State
+# Assign Status (i=INCLUDE, e=EXCLUDE, s=Skip/PENDING): e
+# 
+# Account: National Security Investment Programs, State
+# Assign Status (i=INCLUDE, e=EXCLUDE, s=Skip/PENDING): e
+# 
+# Account: Andean Counterdrug Programs, State
+# Assign Status (i=INCLUDE, e=EXCLUDE, s=Skip/PENDING): e
+# Success: account_list_master updated with 3 new assignments. Total records: 68
 
 # ---------------------------------------------------------------------------
 # --- 4. AWARDS (Sequences 3-4) ---------------------------------------------
@@ -72,11 +86,18 @@ assign_accounts()
 
 # Note: this overwrites the `params` object created by manage_accounts.R,
 # which is fine because the accounts step is finished.
-source("manage_awards.R")
+source("Scripts/04_manage_awards.R")
+
 
 grid_ingest()
 prune_awards()
 
+# 4.1. Review any API calls that did not complete.
+#      An empty table means every call succeeded.
+ingest_log   <- readr::read_csv("logs/award_ingest_log.csv", show_col_types = FALSE)
+failed_calls <- dplyr::filter(ingest_log, adj_data_status != "complete")
+print(failed_calls)
+message(nrow(failed_calls), " of ", nrow(ingest_log), " award API calls did not complete.")
 
 # ---------------------------------------------------------------------------
 # --- 5. VERIFY --------------------------------------------------------------

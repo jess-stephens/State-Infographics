@@ -843,8 +843,8 @@ unbundle_metadata <- function(api_bundle, iteration_ids = NULL) {
     
     tibble::tibble(
       data_status       = api_packet$data_status,
-      last_page         = as.character(api_packet$last_page),
-      has_data          = nrow(api_packet$data) > 0,
+      last_page         = as.character(api_packet$last_page %||% NA_character_),
+      has_data          = isTRUE(nrow(api_packet$data) > 0),
       iteration_context = list(id_list),
       error_message     = if (is.null(api_packet$error_msg)) {
         NA_character_ 
